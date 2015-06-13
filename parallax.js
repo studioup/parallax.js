@@ -99,7 +99,7 @@
           backgroundPosition: this.position
         });
       }
-      return this;
+      //return this;
     }
 
     if (navigator.userAgent.match(/(Android)/)) {
@@ -110,7 +110,7 @@
           backgroundPosition: this.position
         });
       }
-      return this;
+      //return this;
     }
 
     this.$mirror = $('<div />').prependTo('body');
@@ -205,6 +205,14 @@
           this.offsetBaseTop = imageOffsetMin - margin / 2 | 0;
         }
       }
+      /* fix mobile */
+      if(Parallax.winWidth < 600 & this.imageWidth > this.imageHeight){
+        this.offsetLeft
+        this.imageWidth    = this.imageWidth*2 ;
+        this.imageHeight   = this.imageHeight*2;
+        this.offsetLeft = this.offsetLeft - this.imageWidth/4;
+        this.offsetBaseTop = this.offsetBaseTop + this.imageHeight/4;
+      }
     },
 
     render: function() {
@@ -212,8 +220,7 @@
       var scrollLeft   = Parallax.scrollLeft;
       var overScroll   = this.overScrollFix ? Parallax.overScroll : 0;
       var scrollBottom = scrollTop + Parallax.winHeight;
-
-      if (this.boxOffsetBottom > scrollTop && this.boxOffsetTop < scrollBottom) {
+      if (this.boxOffsetBottom +1 > scrollTop && this.boxOffsetTop -1 < scrollBottom) {
         this.visibility = 'visible';
       } else {
         this.visibility = 'hidden';
@@ -257,6 +264,8 @@
     isReady:      false,
     isFresh:      false,
     isBusy:       false,
+    oldScrollTop: 0,
+    oldScrollLeft: 0,
 
     setup: function() {
       if (this.isReady) return;
@@ -279,6 +288,21 @@
           Parallax.overScroll = Math.max($win.scrollTop() - scrollTopMax, Math.min($win.scrollTop(), 0));
           Parallax.requestRender();
         });
+        /*
+        setTimeout(function(){
+            var scrollTopMax  = Parallax.docHeight - Parallax.winHeight;
+            var scrollLeftMax = Parallax.docWidth  - Parallax.winWidth;
+            Parallax.scrollTop  = Math.max(0, Math.min(scrollTopMax,  $win.scrollTop()));
+            Parallax.scrollLeft = Math.max(0, Math.min(scrollLeftMax, $win.scrollLeft()));
+            if(Parallax.scrollTop != Parallax.oldScrollTop || Parallax.scrollLeft != Parallax.oldScrollLeft ){
+                Parallax.oldScrollTop = Parallax.scrollTop;
+                Parallax.oldScrollLeft = Parallax.scrollLeft;
+                Parallax.overScroll = Math.max($win.scrollTop() - scrollTopMax, Math.min($win.scrollTop(), 0));
+                Parallax.requestRender();
+            }
+
+        }, 1000/60);
+        */
 
       this.isReady = true;
     },
